@@ -1,4 +1,4 @@
-# ☕[Library API](https://github.com/Marccelo125/api-library) 🐲
+# 📚[Library API](https://github.com/Marccelo125/api-library) 📦
 
 > [!IMPORTANT]
 > Este projeto é um projeto de estudo e aplicação de uma API e o desenvolvimento de um sistema de gestão de livros.</br>
