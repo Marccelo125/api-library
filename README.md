@@ -1,66 +1,64 @@
+# ☕[Library API](https://github.com/Marccelo125/api-library) 🐲
+
+> [!IMPORTANT]
+> Este projeto é um projeto de estudo e aplicação de uma API e o desenvolvimento de um sistema de gestão de livros.</br>
+
+> [!Tip]
+>O desenvolvimento deste projeto será contínuo e paralelo ao meu aprendizado no curso da [Growdev](https://www.growdev.com.br) patrocinado pela [Sicredi Pioneira](https://sicredipioneira.com.br). Estou aprendendo então caso queira dar um `Fork`, sinta-se a vontade para contribuir.
+
+## Índice
+1. [Sobre Laravel](#sobre-laravel)
+2. [Instalação](#instalação)
+3. [Configuração](#configuração)
+4. [Roteamento](#roteamento)
+5. [Contêiner de injeção de dependência](#contêiner-de-injeção-de-dependência)
+6. [Vários back-ends para armazenamento de sessão e cache](#armazenamento-de-sessão-e-cache)
+7. [Sobre o projeto](#sobre-o-projeto)
+8. [Contribuir](#contribuir)
+9. [Sobre o autor](#sobre-o-autor)
+
+# Sobre o projeto
+Este projeto visa o sistema de uma biblioteca onde podemos cadastrar usuários, livros e empréstimos. Este projeto foi desenvolvido com o objetivo de mostrar como lidar com APIs e o desenvolvimento de um sistema de gestão de livros.
+
+
+# Sobre Laravel
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel é um framework de aplicativo web com sintaxe expressiva e elegante. Acreditamos que o desenvolvimento deve ser uma experiência agradável e criativa para ser verdadeiramente satisfatória. O Laravel simplifica tarefas comuns usadas em muitos projetos web, como:
 
-## About Laravel
+- [Motor de roteamento simples e rápido](#roteamento)
+- [Contêiner de injeção de dependência poderoso](#contêiner-de-injeção-de-dependência)
+- [Vários back-ends para armazenamento de sessão e cache](#armazenamento-de-sessão-e-cache)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# Instalação
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Para instalar o Laravel, siga as instruções no [guia de instalação oficial](https://laravel.com/docs/installation).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Comandos:
 
-## Learning Laravel
+```bash
+composer install
+php artisan migrate
+php artisan serve
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Configuração
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+A configuração do Laravel é feita através do arquivo `.env`. Você pode encontrar mais informações sobre como configurar o seu ambiente no [guia de configuração oficial](https://laravel.com/docs/configuration).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Para rodar o servidor mysql localmente, recomendo usar o Xampp, Docker ou o Laragon.:
 
-## Laravel Sponsors
+Exemplo de .env local:
+```bash
+DB_CONNECTION=mysql # tipo
+DB_HOST=127.0.0.1 # endereço
+DB_PORT=3306 # porta, pode varias de ambiente para ambiente
+DB_DATABASE=library # nome da base de dados
+DB_USERNAME=root # nome do usuário
+DB_PASSWORD= # senha do usuário
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Roteamento
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+O Laravel possui um motor de roteamento simples e rápido. Você pode definir rotas usando o arquivo `routes/web.php` ou `routes/api.php` para rotas web ou API, respectivamente. Para mais informações sobre como definir rotas, consulte o [guia de roteamento oficial](https://laravel.com/docs/routing)
