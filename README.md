@@ -18,8 +18,9 @@
 9. [Sobre o autor](#sobre-o-autor)
 
 # Sobre o projeto
-Este projeto visa o sistema de uma biblioteca onde podemos cadastrar usuários, livros e empréstimos. Este projeto foi desenvolvido com o objetivo de mostrar como lidar com APIs e o desenvolvimento de um sistema de gestão de livros.
+> Este projeto visa o sistema de uma biblioteca onde podemos cadastrar usuários, livros e empréstimos. Este projeto foi desenvolvido com o objetivo de mostrar como lidar com APIs e o desenvolvimento de um sistema de gestão de livros.
 
+![dbeaver ER Diagrama](https://github.com/Marccelo125/api-library/assets/127633664/5af04126-4ae6-4baa-be32-f1c6d37359f6)
 
 # Sobre Laravel
 
