@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > Este projeto é um projeto de estudo e aplicação de uma API e o desenvolvimento de um sistema de gestão de livros.</br>
 
-> [!Tip]
+> [!NOTE]
 >O desenvolvimento deste projeto será contínuo e paralelo ao meu aprendizado no curso da [Growdev](https://www.growdev.com.br) patrocinado pela [Sicredi Pioneira](https://sicredipioneira.com.br). Estou aprendendo então caso queira dar um `Fork`, sinta-se a vontade para contribuir.
 
 ## Índice
