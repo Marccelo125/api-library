@@ -39,7 +39,7 @@ Para instalar o Laravel, siga as instruções no [guia de instalação oficial](
 Comandos:
 
 ```bash
-composer install
+composer update
 php artisan migrate
 php artisan serve
 ```
