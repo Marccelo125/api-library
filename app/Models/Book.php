@@ -25,7 +25,7 @@ class Book extends Model
         if ($this->quantity < $requestedQuantity || !$this->available) {
             return false;
         }
-        if(($this->quantity - $requestedQuantity) == 0) {
+        if (($this->quantity - $requestedQuantity) == 0) {
             $this->available = false;
         }
 
@@ -43,5 +43,10 @@ class Book extends Model
     public function borrow()
     {
         return $this->belongsTo(Borrowing::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
     }
 }
