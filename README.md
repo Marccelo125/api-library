@@ -36,6 +36,8 @@ Laravel é um framework de aplicativo web com sintaxe expressiva e elegante. Acr
 
 Para instalar o Laravel, siga as instruções no [guia de instalação oficial](https://laravel.com/docs/installation).
 
+Lembre-se de ter o Composer, Apache e PHP instalados em sua máquina.
+
 Comandos:
 
 ```bash
