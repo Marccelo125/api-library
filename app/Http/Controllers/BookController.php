@@ -21,14 +21,14 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        // TO DO - Adicionar campo que registra a quantidade de livros que foi emprestado
-        // TO DO - Adicionar uma opção de mandar o id do author pela rota também
+        // TODO - Adicionar campo que registra a quantidade de livros que foi emprestado
+        // TODO - Adicionar uma opção de mandar o id do author pela rota também
         try {
             $request->validate(
                 [
                     'title' => 'required|string|max:255',
                     'description' => 'nullable|string',
-                    'author_id' => 'required|int',
+                    'author_id' => 'required|int|exists: authors, id',
                     'quantity' => 'required|int',
                     'available' => 'nullable|int',
                     'categories' => 'nullable|array',
@@ -38,7 +38,8 @@ class BookController extends Controller
                     'max' => 'O campo :attribute tem que ser 255 caracteres',
                     'string' => 'O campo :attribute tem que ser do tipo string',
                     'int' => 'O campo :attribute tem que ser do tipo integer',
-                    'array' => 'O campo :attribute tem que ser do tipo array'
+                    'array' => 'O campo :attribute tem que ser do tipo array',
+                    'exists' => 'O campo :attribute não existe'
                 ]
             );
 
@@ -79,17 +80,18 @@ class BookController extends Controller
                 [
                     'title' => 'required|string|max:255',
                     'description' => 'nullable|string',
-                    'author_id' => 'required|int',
+                    'author_id' => 'required|int|exists: authors, id',
                     'quantity' => 'required|int',
                     'available' => 'nullable|int',
-                    'categories' => 'nullable|array',
-                ],
-                [
+                    'categories' => 'nullable|array'
+                    ],
+                    [
                     'required' => 'O campo :attribute é obrigatório',
                     'max' => 'O campo :attribute tem que ser 255 caracteres',
                     'string' => 'O campo :attribute tem que ser do tipo string',
                     'int' => 'O campo :attribute tem que ser do tipo integer',
-                    'array' => 'O campo :attribute tem que ser do tipo array'
+                    'array' => 'O campo :attribute tem que ser do tipo array',
+                    'exists' => 'O campo :attribute não existe'
                 ]
             );
 
