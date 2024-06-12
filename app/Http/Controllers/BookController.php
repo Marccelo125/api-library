@@ -21,7 +21,6 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO - Adicionar campo que registra a quantidade de livros que foi emprestado
         // TODO - Adicionar uma opção de mandar o id do author pela rota também
         try {
             $request->validate(

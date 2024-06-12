@@ -11,8 +11,9 @@ class BorrowingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
+
     // TODO - Adicionar uma multa de atraso para retorno
+    // TODO - Adicionar campo que registra a quantidade de livros que foi emprestado
     public function index()
     {
         $borrows = Borrowing::with('user', 'book')->get();
@@ -56,7 +57,7 @@ class BorrowingController extends Controller
                 return response()->json(['success' => false, 'msg' => 'Quantidade indisponível', 'data' => null]);
             }
 
-            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'borrow_date', 'return_date']));
+            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity','borrow_date', 'return_date']));
             return response()->json(['success' => true, 'msg' => 'Emprestimo realizado', 'data' => $borrow]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'msg' => 'Não foi possível realizar o emprestimo', 'data' => $th->getMessage()]);
