@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
+// TODO - Adicionar uma opção de mandar o id do author pela rota também (store)
+// TODO - (ratings - many to many table)
+// Adicionar Avaliações para os livros (1 livro pode ter muitas avaliações e 1 avaliação pode ter muitos livros)
+
 class BookController extends Controller
 {
     /**
@@ -21,13 +25,12 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO - Adicionar uma opção de mandar o id do author pela rota também
         try {
             $request->validate(
                 [
                     'title' => 'required|string|max:255',
                     'description' => 'nullable|string',
-                    'author_id' => 'required|int|exists: authors, id',
+                    'author_id' => 'required|int',
                     'quantity' => 'required|int',
                     'available' => 'nullable|int',
                     'categories' => 'nullable|array',
@@ -79,7 +82,7 @@ class BookController extends Controller
                 [
                     'title' => 'required|string|max:255',
                     'description' => 'nullable|string',
-                    'author_id' => 'required|int|exists: authors, id',
+                    'author_id' => 'required|int',
                     'quantity' => 'required|int',
                     'available' => 'nullable|int',
                     'categories' => 'nullable|array'
