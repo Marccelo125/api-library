@@ -32,8 +32,8 @@ class BorrowingController extends Controller
         // TO DO - Adicionar campo que registra a quantidade de livros que foi emprestado
         try {
             $request->validate([
-                'user_id' => 'required|int|exists: users, id',
-                'book_id' => 'required|int|exists: books, id',
+                'user_id' => 'required|int',
+                'book_id' => 'required|int',
                 'quantity' => 'required|int',
                 'borrow_date' => 'required|date',
                 'return_date' => 'required|date'
@@ -58,6 +58,7 @@ class BorrowingController extends Controller
             }
 
             $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity','borrow_date', 'return_date']));
+            $book->reduceQuantity($quantity);
             return response()->json(['success' => true, 'msg' => 'Emprestimo realizado', 'data' => $borrow]);
         } catch (\Throwable $th) {
             return response()->json(['success' => false, 'msg' => 'Não foi possível realizar o emprestimo', 'data' => $th->getMessage()]);
@@ -84,8 +85,8 @@ class BorrowingController extends Controller
     {
         try {
             $request->validate([
-                'user_id' => 'required|int|exists: users, id',
-                'book_id' => 'required|int|exists: books, id',
+                'user_id' => 'required|int',
+                'book_id' => 'required|int',
                 'quantity' => 'required|int',
                 'borrow_date' => 'required|date',
                 'return_date' => 'required|date'
