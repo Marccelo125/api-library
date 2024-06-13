@@ -35,7 +35,7 @@ class UserController extends Controller
                 'password.min' => 'Sua senha precisa ter no minimo 6 caractéres!',
             ]);
 
-            $newUser = User::create($request->only(['name', 'email', 'password']));
+            $newUser = User::create($request->only(['name', 'email', 'password', 'number']));
             return response()->json(['success' => true, 'msg' => 'Usuário criando com sucesso!', 'data' => $newUser], 200);
         } catch (\Throwable $th) {
             Log::error('Erro ao tentar cadastrar usuário', ['error' => $th->getMessage()]);
@@ -79,7 +79,7 @@ class UserController extends Controller
                 'password.min' => 'Sua senha precisa ter no minimo 6 caractéres!'
             ]);
 
-            $user->update($request->only(['name', 'email', 'password']));
+            $user->update($request->only(['name', 'email', 'password', 'number']));
             $user->save();
 
             return response()->json(['success' => true, 'msg' => 'Usuário atualizado!', 'data' => $user], 200);
