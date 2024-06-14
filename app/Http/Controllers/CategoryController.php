@@ -3,17 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Responses\ApiResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $categories = Category::all();
-        return response()->json(['success' => true, 'msg' => 'Listando categorias', 'data' => $categories]);
+        return ApiResponse::success('Listando categorias!', [$categories]);
     }
 
     /**
@@ -29,22 +27,23 @@ class CategoryController extends Controller
             ]);
 
             $category = Category::create($request->only(['name']));
-            return response()->json(['success'=> true,'msg'=> 'Categoria criada com sucesso', 'data' => $category], 200);
+            return ApiResponse::success('Categoria criada com sucesso', [$category]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível criar a categoria', 'data' => $e->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível criar a categoria', [$e->getMessage()]);
         }
     }
 
     /**
+     * 
      * Display the specified resource.
      */
     public function show(string $id)
     {
         try {
             $category = Category::findOrfail($id);
-            return response()->json(['success' => true, 'msg' => 'Livro encontrado com sucesso!', 'data' => $category], 200);
+            return ApiResponse::success('Livro encontrado com sucesso!', [$category]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível encontrar a categoria', 'data' => $th->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível encontrar a categoria', [$th->getMessage()]);
         }
     }
 
@@ -63,10 +62,9 @@ class CategoryController extends Controller
             $category->update($request->only(['name']));
             $category->save();
             
-            return response()->json(['success'=> true,'msg'=> 'Categoria atualizada com sucesso', 'data' => $category], 200);
-
+            return ApiResponse::success('Categoria atualizada com sucesso', [$category]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível atualizar a categoria', 'data' => $e->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível atualizar a categoria', [$e->getMessage()]);
         }
     }
 
@@ -78,9 +76,10 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrfail($id);
             $category->delete();
-            return response()->json(['success' => true, 'msg' => 'Categoria deletada com sucesso!', 'data' => $category], 200);
+
+            return ApiResponse::success('Categoria deletada com sucesso!', [$category]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível deletar a categoria', 'data' => $th->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível deletar a categoria', [$th->getMessage()]);
         }
     }
 }
