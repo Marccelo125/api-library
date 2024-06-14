@@ -16,6 +16,10 @@ class Rating extends Model
         'book_id',
     ];
 
+    protected function alreadyRated($request) {
+        return $this->where('user_id', $request->user_id)->where('book_id', $request->book_id)->first();
+    }
+
     // RELATIONSHIPS METHODS
     public function user() {
         return $this->belongsTo(User::class);
