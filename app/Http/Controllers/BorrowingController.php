@@ -18,9 +18,6 @@ class BorrowingController extends Controller
         return ApiResponse::success('Listando todos os emprestimós!', [$borrows]);
     }
     
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
@@ -37,18 +34,17 @@ class BorrowingController extends Controller
                 'exist' => 'O campo :attribute não existe'
             ]);
 
-            $book = $request->input('book_id');
-            $book = Book::findOrFail($book);
+            $bookId = $request->input('book_id');
+            $book = Book::findOrFail($bookId);
+            
             $quantity = $request->input('quantity');
-    
-            $bookAvailable = $book->BookService->isAvailableForBorrowing($quantity);
-            $bookAvailable = $book->isAvailableForBorrowing($quantity);
+            $quantityAvailable = $book->BookService->isAvailableForBorrowing($quantity);
             
             if ($book->available = 0) {
                 return ApiResponse::fail('Livro indisponivel!', [null]);
             }
             
-            if ($bookAvailable == false) {
+            if ($quantityAvailable == false) {
                 return ApiResponse::fail('Quantidade indisponivel!', [null]);
             }
 
@@ -61,22 +57,16 @@ class BorrowingController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
         try {
-            $borrow = Borrowing::find($id);
+            $borrow = Borrowing::findOrFail($id);
             return ApiResponse::success('Empréstimo encontrado!', [$borrow]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível encontrar o empréstimo', [$th->getMessage()]);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, int $id)
     {
         try {
@@ -93,8 +83,8 @@ class BorrowingController extends Controller
                 'exist' => 'O campo :attribute não existe'
             ]);
             
-            $book = $request->input('book_id');
-            $book = Book::find($book);
+            $bookId = $request->input('book_id');
+            $book = Book::find($bookId);
 
             if ($request->available = 0 && $book->available = 0) {
                 return ApiResponse::fail('Livro já indisponível', [null]);
@@ -105,7 +95,7 @@ class BorrowingController extends Controller
             }
 
             $borrowing = Borrowing::find($id)
-                ->update($request->only(['user_id', 'book_id', 'borrow_date', 'return_date']));
+                ->update($request->only(['user_id', 'book_id', 'quantity', 'borrow_date', 'return_date']));
 
             return ApiResponse::success('Empréstimo atualizado!', [$borrowing]);
         } catch (\Throwable $th) {
@@ -117,7 +107,6 @@ class BorrowingController extends Controller
     {
         try {
             $borrowing = Borrowing::findOrFail($id)->delete();
-
             return ApiResponse::success('Empréstimo deletado com sucesso!', [$borrowing]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possivel deletar o emprestimo!', [$th->getMessage()]);
