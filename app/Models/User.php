@@ -44,9 +44,14 @@ class User extends Authenticatable
         'password' => 'hashed'
     ];
 
+    // RELATIONSHIPS METHODS
     public function borrows()
     {
         return $this->hasMany(Borrowing::class);
+    }
+
+    public function ratings() {
+        return $this->hasMany(Rating::class);
     }
 
 }
