@@ -13,6 +13,7 @@ class Category extends Model
         "name",
     ];
 
+    // RELATIONSHIPS METHODS
     public function books() {
         return $this->belongsToMany(Book::class);
     }
