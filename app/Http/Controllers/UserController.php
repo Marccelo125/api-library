@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -12,13 +13,12 @@ class UserController extends Controller
     {
         try {
             $users = User::all();
-            return response()->json(['success' => true, 'msg' => 'Listando usuários', 'data' => $users], 200);
+            return ApiResponse::success('Usuários listados com sucesso!', [$users]);
         } catch (\Throwable $th) {
-            Log::error('Erro ao tentar listar usuários', ['error' => $th->getMessage()]);
-            return response()->json(['success' => false, 'msg' => 'Não foi possível listar os usuários'], 400);
+            return ApiResponse::fail('Não foi possível listar os usuários', [$th->getMessage()]);
         };
     }
-
+    
     public function store(Request $request)
     {
         try {
@@ -36,10 +36,9 @@ class UserController extends Controller
             ]);
 
             $newUser = User::create($request->only(['name', 'email', 'password', 'number']));
-            return response()->json(['success' => true, 'msg' => 'Usuário criando com sucesso!', 'data' => $newUser], 200);
+            return ApiResponse::success('Usuário criado com sucesso!', [$newUser]);
         } catch (\Throwable $th) {
-            Log::error('Erro ao tentar cadastrar usuário', ['error' => $th->getMessage()]);
-            return response()->json(['success' => false, 'msg' => 'Não foi possivel criar o usuário'], 400);
+            return ApiResponse::fail('Não foi possível criar o usuário', [$th->getMessage()]);
         }
     }
 
@@ -47,26 +46,25 @@ class UserController extends Controller
     {
         try {
             $user = User::FindOrFail($id);
-            return response()->json(['success' => true, 'msg' => 'Usuário encontrado!', 'data' => $user], 200);
+            return ApiResponse::success('Usuário encontrado com sucesso!', [$user]);
         } catch (\Throwable $th) {
-            Log::error('Erro ao tentar encontrar usuário', ['error' => $th->getMessage()]);
-            return response()->json(['success' => false, 'msg' => 'Não foi possivel encontrar o usuário'], 400);
+            return ApiResponse::fail('Não foi possível encontrar o usuário', [$th->getMessage()]);
         }
     }
-
+    
     public function update(Request $request, string $id)
     {
         try {
             $user = User::find($id);
 
             if (!$user) {
-                return response()->json(['success' => false, 'msg' => 'Usuário não encontrado', 'data' => null]);
+                return ApiResponse::fail('Usuário não encontrado', [null]);
             }
-
-            if (!$request->has('name') && !$request->has('email') && !$request->has('password')) {
-                return response()->json(['success' => false, 'msg' => 'Nenhum dado foi informado para atualizar', 'data' => null]);
+            
+            if (!$request->has('name') && !$request->has('email') && !$request->has('password') && !$request->has('number')) {
+                return ApiResponse::fail('Nenhum dado foi informado para atualizar', [null]);
             }
-
+            
             $request->validate([
                 'name' => 'nullable|string|max:255',
                 'email' => 'nullable|email|unique:users,email,' . $user->id,
@@ -78,26 +76,24 @@ class UserController extends Controller
                 'unique' => 'Este email ja foi cadastrado!',
                 'password.min' => 'Sua senha precisa ter no minimo 6 caractéres!'
             ]);
-
+            
             $user->update($request->only(['name', 'email', 'password', 'number']));
             $user->save();
-
-            return response()->json(['success' => true, 'msg' => 'Usuário atualizado!', 'data' => $user], 200);
+            
+            return ApiResponse::success('Usuário atualizado com sucesso!', [$user]);
         } catch (\Throwable $th) {
-            Log::error('Erro ao tentar atualizar o usuário', ['error' => $th->getMessage()]);
-            return response()->json(['success' => false, 'msg' => 'Não foi possivel atualizar o usuário'], 400);
+            return ApiResponse::fail('Não foi possível atualizar o usuário', [$th->getMessage()]);
         }
     }
-
+    
     public function destroy(string $id)
     {
         try {
             $user = User::FindOrFail($id);
             $user->delete();
-            return response()->json(['success' => true, 'msg' => 'Usuário deletado com sucesso', 'data' => $user], 200);
+            return ApiResponse::success('Usuário deletado com sucesso!', [$user]);
         } catch (\Throwable $th) {
-            Log::error('Erro ao tentar deletar o usuário', ['error' => $th->getMessage()]);
-            return response()->json(['success' => false, 'msg' => 'Não foi possivel deletar o usuário'], 400);
+            return ApiResponse::fail('Não foi possível deletar o usuário', [$th->getMessage()]);
         }
     }
 }
