@@ -3,22 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Author;
+use App\Responses\ApiResponse;
 use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
+    // TODO - Converter returns to apiResponse
     public function index()
     {
         $authors = Author::with('books')->get();
-        return response()->json(['success' => true, 'msg' => 'Listando autores', 'data' => $authors]);
+        return ApiResponse::success('Listando autores!', $authors);
     }
 
     public function store(Request $request)
     {
         try {
-            $request->validate([
+            $request->validate(
+                [
                     'name' => 'required|string'
-                ], [
+                ],
+                [
                     'required' => 'O campo :attribute é obrigatório',
                     'string' => 'O campo :attribute está tem que ser uma string',
                 ]
@@ -26,9 +30,9 @@ class AuthorController extends Controller
 
             $newAuthor = Author::create($request->only(['name']));
 
-            return response()->json(['success' => true, 'msg' => 'Autor(a) criado com sucesso', 'data' => $newAuthor], 200);
+            return ApiResponse::success('Autor(a) criado com sucesso', [$newAuthor]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível criar um autor(a)', 'data' => $th->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível criar um autor(a)', [$th->getMessage()]);
         }
     }
 
@@ -36,18 +40,20 @@ class AuthorController extends Controller
     {
         try {
             $author = Author::with('books')->FindOrFail($id);
-            return response()->json(['success' => true, 'msg' => 'Autor(a) Encontrado!', 'data' => $author], 200);
+            return ApiResponse::success('Autor(a) Encontrado!', [$author]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível encontrar o autor(a)!', 'data' => $th->getMessage()], 400);
+            return apiResponse::fail('Não foi possível encontrar o autor(a)!', [$th->getMessage()]);
         }
     }
 
     public function update(Request $request, string $id)
     {
         try {
-            $request->validate([
+            $request->validate(
+                [
                     'name' => 'required|string'
-                ], [
+                ],
+                [
                     'required' => 'O campo :attribute é obrigatório',
                     'string' => 'O campo :attribute tem que ser do tipo string',
                 ]
@@ -57,9 +63,9 @@ class AuthorController extends Controller
             $author->update($request->only(['name']));
             $author->save();
 
-            return response()->json(['success' => true, 'msg' => 'Autor(a) atualizado com sucesso!', 'data' => $author], 200);
+            return ApiResponse::success('Autor(a) atualizado com sucesso!', [$author]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível atualizar este autor(a)!', 'data' => $th->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível atualizar este autor(a)!', [$th->getMessage()]);
         }
     }
 
@@ -69,9 +75,9 @@ class AuthorController extends Controller
             $author = Author::findOrFail($id);
             $author->delete();
 
-            return response()->json(['success' => true, 'msg' => 'Autor(a) deletado com sucesso!', 'data' => $author], 200);
+            return ApiResponse::success('Autor(a) deletado com sucesso!', [$author]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível deletar este autor(a)!', 'data' => $th->getMessage()], 400);
+            return ApiResponse::fail('Não foi possível deletar este autor(a)!', [$th->getMessage()]);
         }
     }
 }
