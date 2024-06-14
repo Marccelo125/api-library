@@ -4,32 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Borrowing;
+use App\Responses\ApiResponse;
+use App\Services\BookService;
 use Illuminate\Http\Request;
 
 class BorrowingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
     // TODO - Adicionar uma multa de atraso para retorno
-    // TODO - Adicionar campo que registra a quantidade de livros que foi emprestado
+    
     public function index()
     {
         $borrows = Borrowing::with('user', 'book')->get();
-        return response()->json([
-            'success' => true,
-            'message' => 'Listando todos os emprestimos',
-            'data' => $borrows
-        ]);
+        return ApiResponse::success('Listando todos os emprestimós!', [$borrows]);
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // TO DO - Adicionar campo que registra a quantidade de livros que foi emprestado
         try {
             $request->validate([
                 'user_id' => 'required|int',
@@ -47,21 +40,24 @@ class BorrowingController extends Controller
             $book = $request->input('book_id');
             $book = Book::findOrFail($book);
             $quantity = $request->input('quantity');
+    
+            $bookAvailable = $book->BookService->isAvailableForBorrowing($quantity);
             $bookAvailable = $book->isAvailableForBorrowing($quantity);
-
+            
             if ($book->available = 0) {
-                return response()->json(['success' => false, 'msg' => 'Livro indisponível', 'data' => null]);
+                return ApiResponse::fail('Livro indisponivel!', [null]);
             }
-
+            
             if ($bookAvailable == false) {
-                return response()->json(['success' => false, 'msg' => 'Quantidade indisponível', 'data' => null]);
+                return ApiResponse::fail('Quantidade indisponivel!', [null]);
             }
 
             $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity','borrow_date', 'return_date']));
             $book->reduceQuantity($quantity);
-            return response()->json(['success' => true, 'msg' => 'Emprestimo realizado', 'data' => $borrow]);
+
+            return ApiResponse::success('Empréstimo realizado com sucesso!', [$borrow]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível realizar o emprestimo', 'data' => $th->getMessage()]);
+            return ApiResponse::fail('Não foi possível realizar o emprestimo!', [$th->getmessage()]);
         }
     }
 
@@ -72,9 +68,9 @@ class BorrowingController extends Controller
     {
         try {
             $borrow = Borrowing::find($id);
-            return response()->json(['success' => true, 'msg' => 'Emprestimo encontrado', 'data' => $borrow]);
+            return ApiResponse::success('Empréstimo encontrado!', [$borrow]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível encontrar o emprestimo', 'data' => $th->getMessage()]);
+            return ApiResponse::fail('Não foi possível encontrar o empréstimo', [$th->getMessage()]);
         }
     }
 
@@ -96,38 +92,35 @@ class BorrowingController extends Controller
                 'date' => 'O campo :attribute deve ser uma data',
                 'exist' => 'O campo :attribute não existe'
             ]);
-
+            
             $book = $request->input('book_id');
             $book = Book::find($book);
-            $quantity = $request->input('quantity');
 
-            if ($book->quantity <= 0 || $book->available = 0) {
-                return response()->json(['success' => false, 'msg' => 'Livro indisponível', 'data' => null]);
+            if ($request->available = 0 && $book->available = 0) {
+                return ApiResponse::fail('Livro já indisponível', [null]);
             }
-
-            if ($book->quantity < $quantity) {
-                return response()->json(['success' => false, 'msg' => 'Quantidade indisponível', 'data' => null]);
+            
+            if ($request->quantity <= 0 && $book->quantity = 0) {
+                return ApiResponse::fail('A quantidade deste livro já é zero!', [null]);
             }
 
             $borrowing = Borrowing::find($id)
                 ->update($request->only(['user_id', 'book_id', 'borrow_date', 'return_date']));
 
-            return response()->json(['success' => true, 'msg' => 'emprestimo atualizado', 'data' => $borrowing]);
+            return ApiResponse::success('Empréstimo atualizado!', [$borrowing]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível atualizar o emprestimo', 'data' => $th->getMessage()]);
+            return ApiResponse::fail('Não foi possível atualizar o emprestimo', [$th->getMessage()]);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(int $id)
     {
         try {
             $borrowing = Borrowing::findOrFail($id)->delete();
-            return response()->json(['success' => true, 'msg' => 'Emprestimo deletado com sucesso', 'data' => $borrowing]);
+
+            return ApiResponse::success('Empréstimo deletado com sucesso!', [$borrowing]);
         } catch (\Throwable $th) {
-            return response()->json(['success' => false, 'msg' => 'Não foi possível deletar o emprestimo', 'data' => $th->getMessage()]);
+            return ApiResponse::fail('Não foi possivel deletar o emprestimo!', [$th->getMessage()]);
         }
     }
 }
