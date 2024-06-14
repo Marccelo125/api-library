@@ -29,9 +29,4 @@ class BookService
           );
           return $data;
      }
-
-     public function isAvailableForBorrowing(int $requestedQuantity)
-     {
-
-     }
 }
