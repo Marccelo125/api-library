@@ -11,6 +11,7 @@ class Author extends Model
         'name'
     ];
 
+    // RELATIONSHIPS METHODS
     public function books() {
         return $this->HasMany(Book::class);
     }
