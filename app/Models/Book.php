@@ -18,14 +18,12 @@ class Book extends Model
         'quantity',
         'available',
         'categories',
+        'total_pages',
+        'language',
+        'publish_date',
+        'publisher'
     ];
 
-    /**
-     * Check if a book is available for borrowing.
-     *
-     * @param int $requestedQuantity The requested quantity to borrow.
-     * @return bool Returns true if the book is available, false otherwise.
-     */
     public function isAvailableForBorrowing(int $requestedQuantity): bool
     {
         if (!($this->quantity >= $requestedQuantity) || !$this->available) {
@@ -43,6 +41,7 @@ class Book extends Model
         $this->save();
     }
 
+    // RELATIONSHIPS METHODS
     public function author()
     {
         return $this->belongsTo(Author::class);
@@ -56,5 +55,10 @@ class Book extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
     }
 }
