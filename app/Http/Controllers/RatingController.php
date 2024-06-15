@@ -9,8 +9,7 @@ use Number;
 
 class RatingController extends Controller
 {
-    // TODO - CRUD rating
-    // TODO - Converter returns to apiResponse
+    // TODO - Terminar CRUD rating
     public function index()
     {
         //
@@ -18,7 +17,6 @@ class RatingController extends Controller
 
     public function store(Request $request)
     {
-        // TODO - Validar a pontuação do rating, se é apenas . ou ,
         try {
 
             $request->validate([
