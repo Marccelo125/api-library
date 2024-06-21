@@ -23,6 +23,11 @@ class CategoryController extends Controller
                 'required'=> 'O campo :attribute é obrigatório!'
             ]);
 
+            $category = Category::where('name', $request->name)->first();
+            if ($category) {
+                return ApiResponse::fail('Esta categoria ja existe', [$category]);
+            }
+
             $category = Category::create($request->only(['name']));
             return ApiResponse::success('Categoria criada com sucesso', [$category]);
         } catch (\Exception $e) {
@@ -51,7 +56,7 @@ class CategoryController extends Controller
 
             $category = Category::findOrFail($id)->update($request->only(['name']));
             $category->save();
-            
+
             return ApiResponse::success('Categoria atualizada com sucesso', [$category]);
         } catch (\Exception $e) {
             return ApiResponse::fail('Não foi possível atualizar a categoria', [$e->getMessage()]);
