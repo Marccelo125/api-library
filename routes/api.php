@@ -14,9 +14,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->group(function() {
-    Route::apiResource('/books', BookController::class);
-    Route::apiResource('/categories', CategoryController::class);
     Route::apiResource('/authors', AuthorController::class);
+    Route::apiResource('/categories', CategoryController::class);
+    Route::apiResource('/books', BookController::class);
     Route::apiResource('/borrow', BorrowingController::class);
     Route::apiResource('/rating', RatingController::class);
 });
