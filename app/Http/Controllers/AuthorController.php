@@ -12,7 +12,7 @@ class AuthorController extends Controller
     public function index()
     {
         $authors = Author::with('books')->get();
-        return ApiResponse::success('Listando autores!', $authors);
+        return ApiResponse::success('Listando autores!', [$authors]);
     }
 
     public function store(Request $request)
