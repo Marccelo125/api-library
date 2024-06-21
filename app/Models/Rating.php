@@ -16,8 +16,8 @@ class Rating extends Model
         'book_id',
     ];
 
-    protected function alreadyRated($request) {
-        return $this->where('user_id', $request->user_id)->where('book_id', $request->book_id)->first();
+    public static function alreadyRated($request) {
+        return self::where('user_id', $request->user_id)->where('book_id', $request->book_id)->first();
     }
 
     // RELATIONSHIPS METHODS
