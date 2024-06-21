@@ -34,6 +34,11 @@ class Book extends Model
         }
         return true;
     }
+    protected static function isBookAuthorPublished($requestTitle, $requestAuthorId)
+    {
+        $book = self::where('author_id', $requestAuthorId)->where('title', $requestTitle)->first();
+        return $book ? true : false;
+    }
 
     public function reduceQuantity(int $requestedQuantity)
     {
