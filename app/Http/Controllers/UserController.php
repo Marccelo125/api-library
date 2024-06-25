@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Responses\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -18,7 +17,7 @@ class UserController extends Controller
             return ApiResponse::fail('Não foi possível listar os usuários', [$th->getMessage()]);
         };
     }
-    
+
     public function store(Request $request)
     {
         try {
@@ -51,7 +50,7 @@ class UserController extends Controller
             return ApiResponse::fail('Não foi possível encontrar o usuário', [$th->getMessage()]);
         }
     }
-    
+
     public function update(Request $request, string $id)
     {
         try {
@@ -60,11 +59,11 @@ class UserController extends Controller
             if (!$user) {
                 return ApiResponse::fail('Usuário não encontrado', [null]);
             }
-            
+
             if (!$request->has('name') && !$request->has('email') && !$request->has('password') && !$request->has('number')) {
                 return ApiResponse::fail('Nenhum dado foi informado para atualizar', [null]);
             }
-            
+
             $request->validate([
                 'name' => 'nullable|string|max:255',
                 'email' => 'nullable|email|unique:users,email,' . $user->id,
@@ -76,16 +75,16 @@ class UserController extends Controller
                 'unique' => 'Este email ja foi cadastrado!',
                 'password.min' => 'Sua senha precisa ter no minimo 6 caractéres!'
             ]);
-            
+
             $user->update($request->only(['name', 'email', 'password', 'number']));
             $user->save();
-            
+
             return ApiResponse::success('Usuário atualizado com sucesso!', [$user]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível atualizar o usuário', [$th->getMessage()]);
         }
     }
-    
+
     public function destroy(string $id)
     {
         try {

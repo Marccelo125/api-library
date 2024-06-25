@@ -14,7 +14,6 @@ class Borrowing extends Model
         'return_date',
     ];
 
-    // RELATIONSHIPS METHODS
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -11,16 +11,13 @@ use Illuminate\Http\Request;
 class BorrowingController extends Controller
 {
     // TODO - Adicionar uma multa de atraso para retorno
-    
+
     public function index()
     {
         $borrows = Borrowing::with('user', 'book')->get();
         return ApiResponse::success('Listando todos os emprestimós!', [$borrows]);
     }
-    
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         try {
@@ -29,7 +26,7 @@ class BorrowingController extends Controller
                 'book_id' => 'required|int',
                 'quantity' => 'required|int',
                 'borrow_date' => 'required|date',
-                'return_date' => 'required|date'
+                'return_date' => 'nullable|date'
             ], [
                 'required' => 'O campo :attribute é obrigatório',
                 'int' => 'O campo :attribute deve ser um integer',
@@ -37,23 +34,27 @@ class BorrowingController extends Controller
                 'exist' => 'O campo :attribute não existe'
             ]);
 
-            $book = $request->input('book_id');
-            $book = Book::findOrFail($book);
+            $bookId = $request->input('book_id');
+            $book = Book::findOrFail($bookId);
+
             $quantity = $request->input('quantity');
-    
-            $bookAvailable = $book->BookService->isAvailableForBorrowing($quantity);
-            $bookAvailable = $book->isAvailableForBorrowing($quantity);
-            
-            if ($book->available = 0) {
+            $quantityAvailable = $book->bookService->isAvailableForBorrowing($book, $quantity);
+
+
+            if ($book->available == 0) {
                 return ApiResponse::fail('Livro indisponivel!', [null]);
             }
-            
-            if ($bookAvailable == false) {
+
+            if ($request->return_date && $request->return_date < $request->borrow_date) {
+                return ApiResponse::fail('Data de devolução inválida!', [null]);
+            }
+
+            if ($quantityAvailable == false) {
                 return ApiResponse::fail('Quantidade indisponivel!', [null]);
             }
 
-            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity','borrow_date', 'return_date']));
-            $book->reduceQuantity($quantity);
+            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity', 'borrow_date', 'return_date']));
+            $book->bookService->reduceQuantity($quantity);
 
             return ApiResponse::success('Empréstimo realizado com sucesso!', [$borrow]);
         } catch (\Throwable $th) {
@@ -61,22 +62,16 @@ class BorrowingController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
         try {
-            $borrow = Borrowing::find($id);
+            $borrow = Borrowing::findOrFail($id);
             return ApiResponse::success('Empréstimo encontrado!', [$borrow]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível encontrar o empréstimo', [$th->getMessage()]);
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, int $id)
     {
         try {
@@ -92,20 +87,20 @@ class BorrowingController extends Controller
                 'date' => 'O campo :attribute deve ser uma data',
                 'exist' => 'O campo :attribute não existe'
             ]);
-            
-            $book = $request->input('book_id');
-            $book = Book::find($book);
 
-            if ($request->available = 0 && $book->available = 0) {
+            $bookId = $request->input('book_id');
+            $book = Book::find($bookId);
+
+            if ($book->available = 0) {
                 return ApiResponse::fail('Livro já indisponível', [null]);
             }
-            
+
             if ($request->quantity <= 0 && $book->quantity = 0) {
                 return ApiResponse::fail('A quantidade deste livro já é zero!', [null]);
             }
 
             $borrowing = Borrowing::find($id)
-                ->update($request->only(['user_id', 'book_id', 'borrow_date', 'return_date']));
+                ->update($request->only(['user_id', 'book_id', 'quantity', 'borrow_date', 'return_date']));
 
             return ApiResponse::success('Empréstimo atualizado!', [$borrowing]);
         } catch (\Throwable $th) {
@@ -117,7 +112,6 @@ class BorrowingController extends Controller
     {
         try {
             $borrowing = Borrowing::findOrFail($id)->delete();
-
             return ApiResponse::success('Empréstimo deletado com sucesso!', [$borrowing]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possivel deletar o emprestimo!', [$th->getMessage()]);

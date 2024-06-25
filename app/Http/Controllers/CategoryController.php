@@ -14,9 +14,6 @@ class CategoryController extends Controller
         return ApiResponse::success('Listando categorias!', [$categories]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
@@ -26,6 +23,11 @@ class CategoryController extends Controller
                 'required'=> 'O campo :attribute é obrigatório!'
             ]);
 
+            $category = Category::where('name', $request->name)->first();
+            if ($category) {
+                return ApiResponse::fail('Esta categoria ja existe', [$category]);
+            }
+
             $category = Category::create($request->only(['name']));
             return ApiResponse::success('Categoria criada com sucesso', [$category]);
         } catch (\Exception $e) {
@@ -33,10 +35,6 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * 
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         try {
@@ -47,10 +45,7 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, int $id)
     {
         try {
             $request->validade([
@@ -59,18 +54,15 @@ class CategoryController extends Controller
                 'required'=> 'O campo :attribute é obrigatório!'
             ]);
 
-            $category->update($request->only(['name']));
+            $category = Category::findOrFail($id)->update($request->only(['name']));
             $category->save();
-            
+
             return ApiResponse::success('Categoria atualizada com sucesso', [$category]);
         } catch (\Exception $e) {
             return ApiResponse::fail('Não foi possível atualizar a categoria', [$e->getMessage()]);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {

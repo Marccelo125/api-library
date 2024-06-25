@@ -8,11 +8,10 @@ use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
-    // TODO - Converter returns to apiResponse
     public function index()
     {
         $authors = Author::with('books')->get();
-        return ApiResponse::success('Listando autores!', $authors);
+        return ApiResponse::success('Listando autores!', [$authors]);
     }
 
     public function store(Request $request)

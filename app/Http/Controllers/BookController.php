@@ -7,20 +7,26 @@ use App\Responses\ApiResponse;
 use App\Services\BookService;
 use Illuminate\Http\Request;
 
-// TODO - Adicionar uma opção de mandar o id do author pela rota também (store)
-
 class BookController extends Controller
 {
+    private BookService $bookService;
+    public function __construct(BookService $bookService) {
+        $this->bookService = $bookService;
+    }
     public function index()
     {
         $books = Book::with('author')->with('categories')->get();
-        return ApiResponse::success('Listando livros!', $books);
+        return ApiResponse::success('Listando livros!', [$books]);
     }
 
     public function store(Request $request)
     {
         try {
-            $validatedRequest = BookService::validateRequest($request);
+            $validatedRequest = $this->bookService->validateRequest($request);
+            $verifyBook = $this->bookService->isBookAuthorPublished($request->title, $request->author_id);
+
+            if($verifyBook) return ApiResponse::fail('Este autor já publicou este livro', [null]);
+
             $newBook = Book::create($validatedRequest);
 
             if ($request->categories) {
@@ -28,7 +34,6 @@ class BookController extends Controller
             }
 
             $newBook->save();
-
             return ApiResponse::success('Livro criado com sucesso!', [$newBook]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível criar o livro!', [$th->getMessage()]);
@@ -48,7 +53,7 @@ class BookController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $validatedRequest = BookService::validateRequest($request);
+            $validatedRequest = $this->bookService->validateRequest($request);
 
             $book = Book::findOrFail($id);
             $book->update($validatedRequest);
