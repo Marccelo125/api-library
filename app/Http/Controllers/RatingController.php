@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Rating;
 use App\Responses\ApiResponse;
+use App\Services\RatingService;
 use Illuminate\Http\Request;
-use Number;
 
 class RatingController extends Controller
 {
-    // TODO - adicionar uma verificação se aquele usuario fez uma borrowing neste livro
-    // só assim ele vai poder fazer uma avaliação
+    private RatingService $ratingService;
+    public function __construct(RatingService $ratingService)
+    {
+        $this->ratingService = $ratingService;
+    }
     public function index()
     {
         try {
@@ -24,33 +27,25 @@ class RatingController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
-                'rating' => 'required|string',
-                'comment' => 'required|string',
-                'user_id' => 'required|exists:users,id',
-                'book_id' => 'required|exists:books,id',
-            ], [
-                'required' => 'O campo :attribute é obrigatório',
-                'exists' => 'O dado no campo :attribute não existe',
-                'string' => 'O campo :attribute deve ser uma string',
-            ]);
+            $this->ratingService->validateRequest($request);
 
-            $alreadyRated = Rating::alreadyRated($request);
-
+            $alreadyRated = $this->ratingService->alreadyRated($request->book_id, $request->user_id);
             if ($alreadyRated) {
                 return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
             }
 
-            if ($request->rating > 5 || $request->rating < 0) {
-                return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
-            }
+            $ratingValue = $this->ratingService->dotToComma($request->input('rating'));
 
-            $ratingValue = (float) str_replace(',', '.', $request->input('rating'));
             if ($ratingValue > 5 || $ratingValue < 0) {
                 return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
             }
 
-            $rating = Rating::create($request->only(['rating', 'comment', 'user_id', 'book_id']));
+            $rating = Rating::create([
+                'rating' => $ratingValue,
+                'comment' => $request->input('comment'),
+                'user_id' => $request->input('user_id'),
+                'book_id' => $request->input('book_id'),
+            ]);
             return ApiResponse::success('Avaliação criada com sucesso.', [$rating]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível criar a avaliação.', [$th->getMessage()]);
@@ -69,29 +64,27 @@ class RatingController extends Controller
 
     public function update(Request $request, int $id)
     {
+        // Verificar se existe uma avaliação com esse id de livro e user mas que seja diferente do id da rota
         try {
-            $request->validate([
-                'rating' => 'required|string',
-                'comment' => 'required|string',
-                'user_id' => 'required|exists:users,id',
-                'book_id' => 'required|exists:books,id',
-            ], [
-                'required' => 'O campo :attribute é obrigatório',
-                'exists' => 'O dado no campo :attribute não existe',
-                'string' => 'O campo :attribute deve ser uma string',
-            ]);
-
-            $alreadyRated = Rating::alreadyRated($request);
-
-            if ($alreadyRated) return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
-
-            if ($request->rating > 5 || $request->rating < 0) return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
-
-            $ratingValue = (float) str_replace(',', '.', $request->input('rating'));
-            if ($ratingValue > 5 || $ratingValue < 0) return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
+            $this->ratingService->validateRequest($request);
 
             $rating = Rating::findOrFail($id);
+
+            $ratingValue = $this->ratingService->dotToComma($request->input('rating'));
+            $request->merge(['rating' => $ratingValue]);
+
+            $alreadyRated = $this->ratingService->alreadyRated($request->book_id, $request->user_id);
+
+            if ($alreadyRated && $id !== $rating->id) {
+                return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
+            };
+
+            if ($ratingValue > 5 || $ratingValue < 0) {
+                return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
+            };
+
             $rating->update($request->only(['rating', 'comment', 'user_id', 'book_id']));
+
             return ApiResponse::success('Avaliação atualizada com sucesso.', [$rating]);
         } catch (\Throwable $th) {
             return ApiResponse::fail('Não foi possível atualizar a avaliação.', [$th->getMessage()]);
