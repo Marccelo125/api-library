@@ -23,30 +23,6 @@ class Book extends Model
         'publish_date',
         'publisher'
     ];
-
-    public function isAvailableForBorrowing(int $requestedQuantity): bool
-    {
-        if (!($this->quantity >= $requestedQuantity) || !$this->available) {
-            return false;
-        }
-        if (($this->quantity - $requestedQuantity) == 0) {
-            $this->available = false;
-        }
-        return true;
-    }
-    protected static function isBookAuthorPublished($requestTitle, $requestAuthorId)
-    {
-        $book = self::where('author_id', $requestAuthorId)->where('title', $requestTitle)->first();
-        return $book ? true : false;
-    }
-
-    public function reduceQuantity(int $requestedQuantity)
-    {
-        $this->decrement('quantity', $requestedQuantity);
-        $this->save();
-    }
-
-    // RELATIONSHIPS METHODS
     public function author()
     {
         return $this->belongsTo(Author::class);
