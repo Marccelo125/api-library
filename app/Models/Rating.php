@@ -15,12 +15,6 @@ class Rating extends Model
         'user_id',
         'book_id',
     ];
-
-    public static function alreadyRated($request) {
-        return self::where('user_id', $request->user_id)->where('book_id', $request->book_id)->first();
-    }
-
-    // RELATIONSHIPS METHODS
     public function user() {
         return $this->belongsTo(User::class);
     }
