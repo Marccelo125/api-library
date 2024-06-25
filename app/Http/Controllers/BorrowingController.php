@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
 class BorrowingController extends Controller
 {
     // TODO - Adicionar uma multa de atraso para retorno
-    
+
     public function index()
     {
         $borrows = Borrowing::with('user', 'book')->get();
         return ApiResponse::success('Listando todos os emprestimós!', [$borrows]);
     }
-    
+
     public function store(Request $request)
     {
         try {
@@ -26,7 +26,7 @@ class BorrowingController extends Controller
                 'book_id' => 'required|int',
                 'quantity' => 'required|int',
                 'borrow_date' => 'required|date',
-                'return_date' => 'required|date'
+                'return_date' => 'nullable|date'
             ], [
                 'required' => 'O campo :attribute é obrigatório',
                 'int' => 'O campo :attribute deve ser um integer',
@@ -36,20 +36,25 @@ class BorrowingController extends Controller
 
             $bookId = $request->input('book_id');
             $book = Book::findOrFail($bookId);
-            
+
             $quantity = $request->input('quantity');
-            $quantityAvailable = $book->BookService->isAvailableForBorrowing($quantity);
-            
-            if ($book->available = 0) {
+            $quantityAvailable = $book->bookService->isAvailableForBorrowing($book, $quantity);
+
+
+            if ($book->available == 0) {
                 return ApiResponse::fail('Livro indisponivel!', [null]);
             }
-            
+
+            if ($request->return_date && $request->return_date < $request->borrow_date) {
+                return ApiResponse::fail('Data de devolução inválida!', [null]);
+            }
+
             if ($quantityAvailable == false) {
                 return ApiResponse::fail('Quantidade indisponivel!', [null]);
             }
 
-            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity','borrow_date', 'return_date']));
-            $book->reduceQuantity($quantity);
+            $borrow = Borrowing::create($request->only(['user_id', 'book_id', 'quantity', 'borrow_date', 'return_date']));
+            $book->bookService->reduceQuantity($quantity);
 
             return ApiResponse::success('Empréstimo realizado com sucesso!', [$borrow]);
         } catch (\Throwable $th) {
@@ -82,14 +87,14 @@ class BorrowingController extends Controller
                 'date' => 'O campo :attribute deve ser uma data',
                 'exist' => 'O campo :attribute não existe'
             ]);
-            
+
             $bookId = $request->input('book_id');
             $book = Book::find($bookId);
 
-            if ($request->available = 0 && $book->available = 0) {
+            if ($book->available = 0) {
                 return ApiResponse::fail('Livro já indisponível', [null]);
             }
-            
+
             if ($request->quantity <= 0 && $book->quantity = 0) {
                 return ApiResponse::fail('A quantidade deste livro já é zero!', [null]);
             }
