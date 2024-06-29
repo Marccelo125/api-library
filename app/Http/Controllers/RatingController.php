@@ -90,7 +90,7 @@ class RatingController extends Controller
             $alreadyRated = $this->ratingService->alreadyRated($rating->book_id, $rating->user_id);
             $hasInBorrowing = $this->ratingService->hasInBorrows($request->user_id, $request->book_id);
 
-            if ($hasInBorrowing) {
+            if (!$hasInBorrowing) {
                 return ApiResponse::fail('Não pode avaliar um livro sem haver emprestimo.', [null]);
             }
 
