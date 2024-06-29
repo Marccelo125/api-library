@@ -26,6 +26,7 @@ class RatingController extends Controller
 
     public function store(Request $request)
     {
+        // TODO - Fazer um where onde o book_id e o user_id aparecem e pegar o first
         try {
             $this->ratingService->validateRequest($request);
 
@@ -66,14 +67,23 @@ class RatingController extends Controller
     {
         // Verificar se existe uma avaliação com esse id de livro e user mas que seja diferente do id da rota
         try {
-            $this->ratingService->validateRequest($request);
+            $request->validate(
+                [
+                    'rating' => 'required',
+                    'comment' => 'nullable',
+                ],
+                [
+                    'required' => 'O campo :attribute é obrigatório',
+                    'string' => 'O campo :attribute deve ser do tipo string',
+                ]
+            );
 
             $rating = Rating::findOrFail($id);
 
             $ratingValue = $this->ratingService->dotToComma($request->input('rating'));
             $request->merge(['rating' => $ratingValue]);
 
-            $alreadyRated = $this->ratingService->alreadyRated($request->book_id, $request->user_id);
+            $alreadyRated = $this->ratingService->alreadyRated($rating->book_id, $rating->user_id);
 
             if ($alreadyRated && $id !== $rating->id) {
                 return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
@@ -83,7 +93,7 @@ class RatingController extends Controller
                 return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
             };
 
-            $rating->update($request->only(['rating', 'comment', 'user_id', 'book_id']));
+            $rating->update($request->only(['rating', 'comment']));
 
             return ApiResponse::success('Avaliação atualizada com sucesso.', [$rating]);
         } catch (\Throwable $th) {
