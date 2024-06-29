@@ -6,6 +6,7 @@ use App\Models\Rating;
 use App\Responses\ApiResponse;
 use App\Services\RatingService;
 use Illuminate\Http\Request;
+use Spatie\FlareClient\Api;
 
 class RatingController extends Controller
 {
@@ -26,16 +27,20 @@ class RatingController extends Controller
 
     public function store(Request $request)
     {
-        // TODO - Fazer um where onde o book_id e o user_id aparecem e pegar o first
         try {
             $this->ratingService->validateRequest($request);
 
             $alreadyRated = $this->ratingService->alreadyRated($request->book_id, $request->user_id);
+            $ratingValue = $this->ratingService->dotToComma($request->input('rating'));
+            $hasInBorrowing = $this->ratingService->hasInBorrows($request->user_id, $request->book_id);
+
+            if (!$hasInBorrowing) {
+                return ApiResponse::fail('Não pode avaliar um livro sem haver emprestimo.', [null]);
+            }
+
             if ($alreadyRated) {
                 return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
             }
-
-            $ratingValue = $this->ratingService->dotToComma($request->input('rating'));
 
             if ($ratingValue > 5 || $ratingValue < 0) {
                 return ApiResponse::fail('A avaliação deve ter valor inteiro entre 0 e 5.', [null]);
@@ -65,8 +70,7 @@ class RatingController extends Controller
 
     public function update(Request $request, int $id)
     {
-        // Verificar se existe uma avaliação com esse id de livro e user mas que seja diferente do id da rota
-        try {
+         try {
             $request->validate(
                 [
                     'rating' => 'required',
@@ -84,6 +88,11 @@ class RatingController extends Controller
             $request->merge(['rating' => $ratingValue]);
 
             $alreadyRated = $this->ratingService->alreadyRated($rating->book_id, $rating->user_id);
+            $hasInBorrowing = $this->ratingService->hasInBorrows($request->user_id, $request->book_id);
+
+            if ($hasInBorrowing) {
+                return ApiResponse::fail('Não pode avaliar um livro sem haver emprestimo.', [null]);
+            }
 
             if ($alreadyRated && $id !== $rating->id) {
                 return ApiResponse::fail('Avaliação ja foi atribuida.', [null]);
