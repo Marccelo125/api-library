@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Borrowing;
 use App\Models\Rating;
 
 class RatingService
@@ -30,5 +31,14 @@ class RatingService
     public static function dotToComma($ratingValue) {
         $ratingFixed = str_replace('.', ',', $ratingValue);
         return $ratingFixed;
+    }
+
+    public static function hasInBorrows($user_id, $book_id): bool
+    {
+        $borrow = Borrowing::where('user_id', $user_id)->where('book_id', $book_id)->exists();
+        if ($borrow) {
+            return true;
+        }
+        return false;
     }
 }
