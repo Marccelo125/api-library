@@ -25,7 +25,6 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
-                'number' => 'nullble|string|max:255',
             ], [
                 'required' => 'O campo :attribute é obrigatório!',
                 'max' => 'O campo :attribute deve ter no maximo :max caracteres!',
